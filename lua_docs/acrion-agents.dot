@@ -1,0 +1,17 @@
+digraph D {
+
+  "nexuslua::agents::Add" -> AgentLua [label="std::make_shared<AgentLua>(agentName)\nStart(pathToLuaFile, luaCode);", fontsize=10];
+  "nexuslua::agents::Add" -> AgentCpp [label="std::make_shared<AgentCpp>(agentName)\nStart(cppHandler);", fontsize=10];
+AgentLua -> Agent;
+AgentCpp -> Agent;
+  "nexuslua::agents::InstallPlugin" -> "AgentPlugin\nStart(this, pluginPath)" [label="std::make_shared<AgentPlugin>(pluginPath)", fontsize=10];
+  "AgentPlugin\nStart(this, pluginPath)" -> Agent;
+  Agent -> "startAgentLua[AgentN](luaPath, luaCode, this);"
+  Agent -> "startAgentLua[AgentN](pluginPath / \"main.lua\", \"\", agent);"
+  Agent -> "startAgentCpp[AgentN](cppHandler, this);"
+  "startAgentLua[AgentN](luaPath, luaCode, this);" -> "ThreadPool<AgentN>::Get().StartThread(luaPath, luaCode, agent);"
+  "startAgentLua[AgentN](pluginPath / \"main.lua\", \"\", agent);" -> "ThreadPool<AgentN>::Get().StartThread(luaPath, luaCode, agent);"
+  "startAgentCpp[AgentN](cppHandler, this);" -> "ThreadPool<AgentN>::Get().StartThread(cppHandler, agent);"
+  "ThreadPool<AgentN>::Get().StartThread(luaPath, luaCode, agent);" -> "std::make_shared<AgentThreadLua<MessageToAgent<AgentN>>>\n(luaFilePath, luaCode, _messageManager, agent);"
+  "ThreadPool<AgentN>::Get().StartThread(cppHandler, agent);" -> "std::make_shared<AgentThreadCpp<MessageToAgent<AgentN>>>\n(cppHandler, _messageManager, agent);"
+}
