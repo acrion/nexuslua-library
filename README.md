@@ -220,11 +220,6 @@ Have questions, want to share what you've built, or just say hi? Join our commun
 
 ---
 
-## Build
-
-To build the `nexuslua` library and its dependencies, please use the all-in-one build repository: *
-*[https://github.com/acrion/nexuslua-build](https://github.com/acrion/nexuslua-build)**.
-
 **Dependencies:**
 
 ```bash
