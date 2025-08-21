@@ -70,8 +70,6 @@ FetchContent_Declare(
     GIT_TAG v5.4.8
     GIT_SHALLOW TRUE
 )
-set(LUA_BUILD_EXECUTABLES OFF CACHE BOOL "Do not build lua/luac executables" FORCE)
-set(LUA_BUILD_SHARED OFF CACHE BOOL "Build a static library" FORCE)
 FetchContent_MakeAvailable(lua)
 
 # cbeam
