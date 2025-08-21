@@ -1,17 +1,18 @@
 **A C++ library for embedding a multi-threaded, message-passing Lua environment.**
 
 `nexuslua` is a C++ library that extends Lua with a powerful concurrency model based on **agents** and **asynchronous
-messaging
-**. It allows you to run multiple Lua states - and even C++ components - in separate OS-level threads, communicating safely and efficiently through a message-passing architecture. This solves common problems in complex applications, such as UI blocking from long-running tasks and tangled state management.
+messaging**. It allows you to run multiple Lua states - and even C++ components - in separate OS-level threads, communicating safely and efficiently through a message-passing architecture. This solves common problems in complex applications, such as UI blocking from long-running tasks and tangled state management.
+
+nexuslua integrates with your C++ project by extending the **official, unmodified Lua 5.4 core**. This means you get powerful new concurrency features without sacrificing compatibility with the existing Lua ecosystem. No surprises!
 
 The library is designed to be lightweight and embeddable, staying true to the spirit of Lua. While it currently uses some Boost components, the long-term goal is to replace all boost dependencies with [Cbeam](https://github.com/acrion/Cbeam).
 
-> **Watch the Talk:** For a deep dive into the original concepts, check out the presentation from the *
-*[Lua Workshop 2022](https://www.youtube.com/watch?v=Y6wz6Qk475E)** (under the project's former name, "acrionlua").
+> **Watch the Talk:** For a deep dive into the original concepts, check out the presentation from the 
+[Lua Workshop 2022](https://www.youtube.com/watch?v=Y6wz6Qk475E) (under the project's former name, "acrionlua").
 >
-> **Looking for a user-focused introduction?
-** For a hands-on tutorial on how to use agents and plugins, please see the [**nexuslua executable README
-**](https://github.com/acrion/nexuslua).
+> Looking for a user-focused introduction?
+For a hands-on tutorial on how to use agents and plugins, please see the [nexuslua executable README
+](https://github.com/acrion/nexuslua).
 
 ---
 
@@ -68,14 +69,11 @@ That's it. CMake will automatically fetch the specified version of `nexuslua`, c
 
 nexuslua's design revolves around three main concepts:
 
-1. **Agents
-   **: An agent is an independent entity that runs in its own OS thread. It has a name and a set of message handlers. Agents can be written in Lua (
+1. **Agents**: An agent is an independent entity that runs in its own OS thread. It has a name and a set of message handlers. Agents can be written in Lua (
    `AgentLua`) or C++ (`AgentCpp`). A special type, `AgentPlugin`, adds metadata for discovery and management.
-2. **Messages
-   **: Agents communicate exclusively by sending asynchronous messages to each other. A message consists of a name and a parameter payload, which is a flexible, nested key-value structure (
+2. **Messages**: Agents communicate exclusively by sending asynchronous messages to each other. A message consists of a name and a parameter payload, which is a flexible, nested key-value structure (
    `nexuslua::LuaTable`). The sender does not block; it fires the message and continues its work.
-3. **The `nexuslua::agents` Manager
-   **: This is the central C++ class that you, as the embedder, interact with. It manages the lifecycle of all agents, dispatches messages between them, and provides the entry point into the nexuslua ecosystem.
+3. **The `nexuslua::agents` Manager**: This is the central C++ class that you, as the embedder, interact with. It manages the lifecycle of all agents, dispatches messages between them, and provides the entry point into the nexuslua ecosystem.
 
 ---
 
