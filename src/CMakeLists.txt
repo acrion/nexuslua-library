@@ -71,6 +71,12 @@ FetchContent_Declare(
     GIT_SHALLOW TRUE
 )
 FetchContent_MakeAvailable(lua)
+file(GLOB lua_sources
+    "${lua_SOURCE_DIR}/*.c"
+)
+list(REMOVE_ITEM lua_sources "${lua_SOURCE_DIR}/lua.c")
+list(REMOVE_ITEM lua_sources "${lua_SOURCE_DIR}/onelua.c")
+list(REMOVE_ITEM lua_sources "${lua_SOURCE_DIR}/ltests.c")
 
 # cbeam
 if (NOT TARGET cbeam)
@@ -202,6 +208,7 @@ add_custom_command(
     MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/lua_code_generator_find_signature.lua
 )
 
+source_group(lua.org REGULAR_EXPRESSION ${lua_SOURCE_DIR}/)
 source_group(boost.org REGULAR_EXPRESSION boost/)
 source_group(interface REGULAR_EXPRESSION "interface/")
 source_group(generated REGULAR_EXPRESSION ${CMAKE_CURRENT_BINARY_DIR}/)
@@ -263,9 +270,10 @@ set(SRCS
     utility.cpp
     version.txt.cmake
     ${boost_filesystem}
+    ${lua_sources}
 )
 
-foreach (source IN LISTS boost_filesystem)
+foreach (source IN LISTS boost_filesystem lua_sources)
     if (MSVC)
         set_source_files_properties(${source} PROPERTIES COMPILE_FLAGS "/W0")
     elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -323,23 +331,35 @@ target_include_directories(${PROJECT_NAME}
 # Linking
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     add_definitions(-DBOOST_ALL_NO_LIB)
-    target_link_libraries(${PROJECT_NAME} PUBLIC cbeam PRIVATE zip tomlplusplus::tomlplusplus lua OpenMP::OpenMP_CXX ${OPENSSL_TARGETS} version)
+    target_link_libraries(${PROJECT_NAME} PUBLIC cbeam PRIVATE zip tomlplusplus::tomlplusplus OpenMP::OpenMP_CXX ${OPENSSL_TARGETS} version)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
 
     if (WIN32) # MinGW (msys2/ucrt64)
-        target_link_libraries(${PROJECT_NAME} PUBLIC cbeam PRIVATE zip tomlplusplus::tomlplusplus lua OpenMP::OpenMP_CXX ${OPENSSL_TARGETS} Threads::Threads stdc++fs libversion.a ws2_32)
+        target_link_libraries(${PROJECT_NAME} PUBLIC cbeam PRIVATE zip tomlplusplus::tomlplusplus OpenMP::OpenMP_CXX ${OPENSSL_TARGETS} Threads::Threads stdc++fs libversion.a ws2_32)
     elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-        target_link_libraries(${PROJECT_NAME} PUBLIC cbeam PRIVATE zip tomlplusplus::tomlplusplus lua OpenMP::OpenMP_CXX ${OPENSSL_TARGETS} Threads::Threads stdc++fs)
+        target_link_libraries(${PROJECT_NAME} PUBLIC cbeam PRIVATE zip tomlplusplus::tomlplusplus OpenMP::OpenMP_CXX ${OPENSSL_TARGETS} Threads::Threads stdc++fs)
     elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-        target_link_libraries(${PROJECT_NAME} PUBLIC cbeam PRIVATE zip tomlplusplus::tomlplusplus lua OpenMP::OpenMP_CXX ${OPENSSL_TARGETS} Threads::Threads)
+        target_link_libraries(${PROJECT_NAME} PUBLIC cbeam PRIVATE zip tomlplusplus::tomlplusplus OpenMP::OpenMP_CXX ${OPENSSL_TARGETS} Threads::Threads)
     endif ()
 else ()
-    target_link_libraries(${PROJECT_NAME} PUBLIC cbeam PRIVATE zip tomlplusplus::tomlplusplus lua OpenMP::OpenMP_CXX ${OPENSSL_TARGETS})
+    target_link_libraries(${PROJECT_NAME} PUBLIC cbeam PRIVATE zip tomlplusplus::tomlplusplus OpenMP::OpenMP_CXX ${OPENSSL_TARGETS})
 endif ()
 
 include(${acrion_cmake_SOURCE_DIR}/do-logging.cmake)
+
+file(GLOB PUBLIC_HEADERS "interface/nexuslua/*.hpp")
+
+install(TARGETS ${PROJECT_NAME}
+    EXPORT nexuslua-targets
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+)
+
+install(FILES ${PUBLIC_HEADERS}
+    DESTINATION include/nexuslua
+)
 
 # ------------------------------------------------------------------------------
 # Tests

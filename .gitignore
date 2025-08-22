@@ -38,7 +38,9 @@ unsuccessfulbuild
 **/Release*
 **/Debug*
 **/packages/*
+pkgdir
 build-*
+build/
 testbuild*
 src/build/*
 **/*.kdev4
