@@ -353,6 +353,7 @@ file(GLOB PUBLIC_HEADERS "interface/nexuslua/*.hpp")
 
 install(TARGETS ${PROJECT_NAME}
     EXPORT nexuslua-targets
+    RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
 )
